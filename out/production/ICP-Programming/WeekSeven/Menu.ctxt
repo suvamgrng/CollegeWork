@@ -1,0 +1,22 @@
+#BlueJ class context
+comment0.target=Menu
+comment0.text=\n\ Write\ a\ description\ of\ class\ Menu\ here.\n\n\ @author\ (your\ name)\n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=itemName\ price\ category\ vegetarian\ available
+comment1.target=Menu(java.lang.String,\ float,\ java.lang.String,\ boolean,\ boolean)
+comment2.params=
+comment2.target=java.lang.String\ getIteName()
+comment3.params=
+comment3.target=float\ getPrice()
+comment4.params=
+comment4.target=java.lang.String\ getCategory()
+comment5.params=
+comment5.target=boolean\ isVegetarian()
+comment6.params=
+comment6.target=boolean\ isAvailable()
+comment7.params=vegetarian
+comment7.target=void\ isVegetarian(boolean)
+comment8.params=available
+comment8.target=void\ isAvailable(boolean)
+comment9.params=
+comment9.target=java.lang.String\ toString()
+numComments=10

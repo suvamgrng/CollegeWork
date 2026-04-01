@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.target=ManCity
+comment0.text=\n\ Write\ a\ description\ of\ class\ MainCity\ here.\n\n\ @author\ (your\ name)\n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=
+comment1.target=java.lang.String\ getCoachName()
+comment2.params=coachName
+comment2.target=void\ setCoachName(java.lang.String)
+comment3.params=
+comment3.target=int\ getGoalDifference()
+comment4.params=goalDifference
+comment4.target=void\ setGoalDifference(int)
+comment5.params=args
+comment5.target=void\ main(java.lang.String[])
+numComments=6
