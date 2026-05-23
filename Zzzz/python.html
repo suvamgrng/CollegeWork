@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Fundamentals MCQ Exam - 70 Questions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-screen.hidden {
+            display: none;
+        }
+
+        .exam-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+
+        .exam-info strong {
+            display: block;
+            margin: 10px 0 5px 0;
+            font-size: 1.3em;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Exam Screen */
+        .exam-screen {
+            display: none;
+        }
+
+        .exam-screen.active {
+            display: block;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 1.3em;
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .question-number {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .difficulty {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .difficulty.easy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty.hard {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f9f9f9;
+            font-size: 1.05em;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .option-label {
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #d0d0d0;
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .question-counter {
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .results-screen.active {
+            display: block;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .score-value {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .score-percentage {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .score-message {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .results-details {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-item {
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .result-item.correct {
+            border-left-color: #28a745;
+        }
+
+        .result-item.incorrect {
+            border-left-color: #dc3545;
+        }
+
+        .result-item-question {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-item-answer {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .result-item-answer strong {
+            color: #333;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 30px;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Review Mode */
+        .review-toggle {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .review-toggle input {
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .review-message {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            color: #0c5aa0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .question-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .score-value {
+                font-size: 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <div class="header">
+            <h1>🐍 Python Fundamentals Exam</h1>
+            <p>Test Your Knowledge</p>
+        </div>
+        <div class="exam-info">
+            <strong>📋 Exam Details:</strong>
+            <div>Total Questions: <strong>70</strong></div>
+            <div>Time Limit: <strong>90 minutes</strong></div>
+            <div>Question Types: <strong>Multiple Choice (A, B, C, D)</strong></div>
+            <strong style="margin-top: 20px;">📚 Topics Covered:</strong>
+            <div>✓ Data Types & Conversions</div>
+            <div>✓ Arithmetic Operators</div>
+            <div>✓ Comments</div>
+            <div>✓ Branching (if/else/elif)</div>
+            <div>✓ Iteration (for/while loops)</div>
+            <div>✓ Lists, Tuples, Dictionaries, Sets</div>
+            <div>✓ 2D Lists</div>
+            <div>✓ Bubble Sorting</div>
+            <div>✓ Functions</div>
+        </div>
+        <button class="btn-start" onclick="startExam()">Start Exam</button>
+    </div>
+
+    <!-- Exam Screen -->
+    <div class="exam-screen" id="examScreen">
+        <div class="header">
+            <h1>🐍 Python Fundamentals Exam</h1>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="progress-text">
+            <span id="progressText">Question 1 of 70</span>
+        </div>
+
+        <div class="timer" id="timer">Time: 90:00</div>
+
+        <div class="question-container">
+            <div class="question-header">
+                <span class="question-number" id="questionNum">Q1</span>
+                <span class="difficulty" id="difficulty">Easy</span>
+            </div>
+            <div class="question-text" id="questionText">Question will appear here</div>
+            <div class="options" id="optionsContainer"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" id="btnPrevious" onclick="previousQuestion()" disabled>← Previous</button>
+            <span class="question-counter"><span id="currentQuestion">1</span> / 70</span>
+            <button class="btn btn-primary" id="btnNext" onclick="nextQuestion()">Next →</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="submitExam()" style="width: 200px;">Submit Exam</button>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div class="results-screen" id="resultsScreen">
+        <div class="header">
+            <h1>🎉 Exam Completed!</h1>
+        </div>
+
+        <div class="score-card">
+            <div class="score-percentage" id="scorePercentage">0%</div>
+            <div class="score-value" id="scoreValue">0/70</div>
+            <div class="score-message" id="scoreMessage">Great Job!</div>
+        </div>
+
+        <div class="review-toggle">
+            <label>
+                <input type="checkbox" id="reviewToggle" onchange="toggleReview()">
+                Review Answers
+            </label>
+        </div>
+
+        <div id="reviewSection" style="display: none;">
+            <div class="review-message">
+                📝 Review your answers below. Correct answers are highlighted in green, incorrect in red.
+            </div>
+            <div class="results-details" id="resultsDetails"></div>
+        </div>
+
+        <button class="btn-restart" onclick="restartExam()">Restart Exam</button>
+    </div>
+</div>
+
+<script>
+    // Quiz Questions Array
+    const questions = [
+        // Data Types & Conversions (10 questions)
+        {
+            id: 1,
+            category: "Data Types & Conversions",
+            difficulty: "easy",
+            question: "What is the output of int('25')?",
+            options: ["'25'", "25", "Error", "25.0"],
+            correct: 1
+        },
+        {
+            id: 2,
+            category: "Data Types & Conversions",
+            difficulty: "easy",
+            question: "What is the data type of x = 5.5?",
+            options: ["int", "float", "string", "boolean"],
+            correct: 1
+        },
+        {
+            id: 3,
+            category: "Data Types & Conversions",
+            difficulty: "easy",
+            question: "Convert the integer 10 to a string. What is the result?",
+            options: ["10", "'10'", "\"10\"", "Error"],
+            correct: 2
+        },
+        {
+            id: 4,
+            category: "Data Types & Conversions",
+            difficulty: "medium",
+            question: "What does float('3.14') return?",
+            options: ["'3.14'", "3.14", "3", "Error"],
+            correct: 1
+        },
+        {
+            id: 5,
+            category: "Data Types & Conversions",
+            difficulty: "medium",
+            question: "What is the output of bool(0)?",
+            options: ["True", "False", "0", "Error"],
+            correct: 1
+        },
+        {
+            id: 6,
+            category: "Data Types & Conversions",
+            difficulty: "medium",
+            question: "What is the output of str(True)?",
+            options: ["'True'", "True", "1", "'true'"],
+            correct: 0
+        },
+        {
+            id: 7,
+            category: "Data Types & Conversions",
+            difficulty: "medium",
+            question: "What is the type of x = '100' after int(x)?",
+            options: ["string", "int", "float", "boolean"],
+            correct: 1
+        },
+        {
+            id: 8,
+            category: "Data Types & Conversions",
+            difficulty: "hard",
+            question: "What is the output of int(3.99)?",
+            options: ["3.99", "4", "3", "Error"],
+            correct: 2
+        },
+        {
+            id: 9,
+            category: "Data Types & Conversions",
+            difficulty: "hard",
+            question: "What does bool('0') return?",
+            options: ["False", "True", "0", "Error"],
+            correct: 1
+        },
+        {
+            id: 10,
+            category: "Data Types & Conversions",
+            difficulty: "hard",
+            question: "What is the output of float('10')?",
+            options: ["10", "10.0", "'10'", "Error"],
+            correct: 1
+        },
+
+        // Arithmetic Operators (8 questions)
+        {
+            id: 11,
+            category: "Arithmetic Operators",
+            difficulty: "easy",
+            question: "What is the output of 10 + 5?",
+            options: ["15", "105", "10+5", "Error"],
+            correct: 0
+        },
+        {
+            id: 12,
+            category: "Arithmetic Operators",
+            difficulty: "easy",
+            question: "What is the output of 20 - 8?",
+            options: ["12", "28", "-12", "Error"],
+            correct: 0
+        },
+        {
+            id: 13,
+            category: "Arithmetic Operators",
+            difficulty: "easy",
+            question: "What is the output of 6 * 4?",
+            options: ["24", "10", "2", "Error"],
+            correct: 0
+        },
+        {
+            id: 14,
+            category: "Arithmetic Operators",
+            difficulty: "medium",
+            question: "What is the output of 20 / 4?",
+            options: ["5", "5.0", "0", "Error"],
+            correct: 1
+        },
+        {
+            id: 15,
+            category: "Arithmetic Operators",
+            difficulty: "medium",
+            question: "What is the output of 17 // 5?",
+            options: ["3.4", "3", "2", "4"],
+            correct: 1
+        },
+        {
+            id: 16,
+            category: "Arithmetic Operators",
+            difficulty: "medium",
+            question: "What is the output of 17 % 5?",
+            options: ["3", "2", "12", "1"],
+            correct: 1
+        },
+        {
+            id: 17,
+            category: "Arithmetic Operators",
+            difficulty: "hard",
+            question: "What is the output of 2 ** 3?",
+            options: ["6", "8", "5", "2"],
+            correct: 1
+        },
+        {
+            id: 18,
+            category: "Arithmetic Operators",
+            difficulty: "hard",
+            question: "What is the output of 3 + 5 * 2?",
+            options: ["16", "13", "10", "20"],
+            correct: 1
+        },
+
+        // Comments (3 questions)
+        {
+            id: 19,
+            category: "Comments",
+            difficulty: "easy",
+            question: "Which symbol is used for single-line comments in Python?",
+            options: ["//", "#", "/*", "--"],
+            correct: 1
+        },
+        {
+            id: 20,
+            category: "Comments",
+            difficulty: "easy",
+            question: "What is used for multi-line comments in Python?",
+            options: ["//", "/* */", "''' ''' or \"\"\" \"\"\"", "--"],
+            correct: 2
+        },
+        {
+            id: 21,
+            category: "Comments",
+            difficulty: "medium",
+            question: "Which of the following is a valid comment?",
+            options: ["<!-- comment -->", "# This is a comment", "// comment", "/* comment */"],
+            correct: 1
+        },
+
+        // Branching (10 questions)
+        {
+            id: 22,
+            category: "Branching",
+            difficulty: "easy",
+            question: "What is the output of:\nif 5 > 3:\n    print('yes')\nelse:\n    print('no')",
+            options: ["no", "yes", "Error", "5 > 3"],
+            correct: 1
+        },
+        {
+            id: 23,
+            category: "Branching",
+            difficulty: "easy",
+            question: "What keyword is used for alternative conditions?",
+            options: ["else if", "elif", "elseif", "else"],
+            correct: 1
+        },
+        {
+            id: 24,
+            category: "Branching",
+            difficulty: "easy",
+            question: "What is the output of:\nx = 10\nif x < 5:\n    print('small')\nelse:\n    print('large')",
+            options: ["small", "large", "Error", "10"],
+            correct: 1
+        },
+        {
+            id: 25,
+            category: "Branching",
+            difficulty: "medium",
+            question: "What does the 'and' operator do?",
+            options: ["Returns True if one condition is True", "Returns True if both conditions are True", "Returns False", "Adds values"],
+            correct: 1
+        },
+        {
+            id: 26,
+            category: "Branching",
+            difficulty: "medium",
+            question: "What is the output of:\nx = 5\nif x > 3 and x < 10:\n    print('yes')\nelse:\n    print('no')",
+            options: ["no", "yes", "Error", "3"],
+            correct: 1
+        },
+        {
+            id: 27,
+            category: "Branching",
+            difficulty: "medium",
+            question: "What does the 'or' operator do?",
+            options: ["Returns True only if both conditions are True", "Returns True if at least one condition is True", "Returns False", "Multiplies values"],
+            correct: 1
+        },
+        {
+            id: 28,
+            category: "Branching",
+            difficulty: "medium",
+            question: "What is the output of:\nx = 2\nif x == 2 or x == 3:\n    print('match')\nelse:\n    print('no match')",
+            options: ["no match", "match", "Error", "2"],
+            correct: 1
+        },
+        {
+            id: 29,
+            category: "Branching",
+            difficulty: "hard",
+            question: "What is the output of:\nx = 5\nif x > 10:\n    print('a')\nelif x > 3:\n    print('b')\nelse:\n    print('c')",
+            options: ["a", "b", "c", "Error"],
+            correct: 1
+        },
+        {
+            id: 30,
+            category: "Branching",
+            difficulty: "hard",
+            question: "What is the output of:\nif not (5 > 3):\n    print('true')\nelse:\n    print('false')",
+            options: ["true", "false", "Error", "5 > 3"],
+            correct: 1
+        },
+        {
+            id: 31,
+            category: "Branching",
+            difficulty: "hard",
+            question: "What is the output of:\nx = 15\nif x > 10 and x < 20 and x % 2 == 1:\n    print('odd')\nelse:\n    print('even')",
+            options: ["even", "odd", "Error", "15"],
+            correct: 1
+        },
+
+        // Iteration (10 questions)
+        {
+            id: 32,
+            category: "Iteration",
+            difficulty: "easy",
+            question: "What is the output of:\nfor i in range(3):\n    print(i)",
+            options: ["1 2 3", "0 1 2", "0 1 2 3", "Error"],
+            correct: 1
+        },
+        {
+            id: 33,
+            category: "Iteration",
+            difficulty: "easy",
+            question: "How many times will the loop run?\nfor i in range(5):",
+            options: ["4", "5", "6", "0"],
+            correct: 1
+        },
+        {
+            id: 34,
+            category: "Iteration",
+            difficulty: "easy",
+            question: "What is the output of:\ni = 0\nwhile i < 3:\n    print(i)\n    i += 1",
+            options: ["0 1 2", "0 1 2 3", "1 2 3", "Error"],
+            correct: 0
+        },
+        {
+            id: 35,
+            category: "Iteration",
+            difficulty: "medium",
+            question: "What does the 'break' statement do?",
+            options: ["Skips current iteration", "Exits the loop", "Restarts the loop", "Returns a value"],
+            correct: 1
+        },
+        {
+            id: 36,
+            category: "Iteration",
+            difficulty: "medium",
+            question: "What is the output of:\nfor i in range(5):\n    if i == 2:\n        break\n    print(i)",
+            options: ["0 1 2 3 4", "0 1 2", "0 1", "1 2"],
+            correct: 2
+        },
+        {
+            id: 37,
+            category: "Iteration",
+            difficulty: "medium",
+            question: "What does the 'continue' statement do?",
+            options: ["Exits the loop", "Skips current iteration", "Restarts the loop", "Returns a value"],
+            correct: 1
+        },
+        {
+            id: 38,
+            category: "Iteration",
+            difficulty: "medium",
+            question: "What is the output of:\nfor i in range(5):\n    if i == 2:\n        continue\n    print(i)",
+            options: ["0 1 2 3 4", "0 1 3 4", "0 1", "2 3 4"],
+            correct: 1
+        },
+        {
+            id: 39,
+            category: "Iteration",
+            difficulty: "hard",
+            question: "What is the output of:\nfor i in range(3):\n    for j in range(2):\n        print(i, j)",
+            options: ["0 0 1 1 2 2", "0 0 0 1 1 0 1 1 2 0 2 1", "0 1 2", "Error"],
+            correct: 1
+        },
+        {
+            id: 40,
+            category: "Iteration",
+            difficulty: "hard",
+            question: "What is the output of:\ncount = 0\nwhile count < 3:\n    count += 1\nprint(count)",
+            options: ["0", "1", "3", "Error"],
+            correct: 2
+        },
+        {
+            id: 41,
+            category: "Iteration",
+            difficulty: "hard",
+            question: "How many times will the loop run?\ni = 0\nwhile True:\n    i += 1\n    if i == 3:\n        break",
+            options: ["Infinite", "2", "3", "0"],
+            correct: 2
+        },
+
+        // Data Structures - Lists (3 questions)
+        {
+            id: 42,
+            category: "Data Structures",
+            difficulty: "easy",
+            question: "What is the output of:\nmy_list = [1, 2, 3, 4, 5]\nprint(my_list[0])",
+            options: ["5", "1", "0", "Error"],
+            correct: 1
+        },
+        {
+            id: 43,
+            category: "Data Structures",
+            difficulty: "easy",
+            question: "What is the output of:\nmy_list = [10, 20, 30]\nprint(len(my_list))",
+            options: ["3", "30", "2", "Error"],
+            correct: 0
+        },
+        {
+            id: 44,
+            category: "Data Structures",
+            difficulty: "medium",
+            question: "What is the output of:\nmy_list = [1, 2, 3]\nmy_list.append(4)\nprint(my_list)",
+            options: ["[1, 2, 3]", "[1, 2, 3, 4]", "[4, 1, 2, 3]", "Error"],
+            correct: 1
+        },
+
+        // Data Structures - Tuples (3 questions)
+        {
+            id: 45,
+            category: "Data Structures",
+            difficulty: "easy",
+            question: "What is the output of:\nmy_tuple = (1, 2, 3)\nprint(my_tuple[1])",
+            options: ["1", "2", "3", "Error"],
+            correct: 1
+        },
+        {
+            id: 46,
+            category: "Data Structures",
+            difficulty: "medium",
+            question: "Can you modify a tuple after creation?",
+            options: ["Yes", "No", "Only the first element", "Error"],
+            correct: 1
+        },
+        {
+            id: 47,
+            category: "Data Structures",
+            difficulty: "medium",
+            question: "What is the output of:\nmy_tuple = (1, 2, 3, 2)\nprint(my_tuple.count(2))",
+            options: ["1", "2", "3", "Error"],
+            correct: 1
+        },
+
+        // Data Structures - Dictionaries (3 questions)
+        {
+            id: 48,
+            category: "Data Structures",
+            difficulty: "easy",
+            question: "What is the output of:\nmy_dict = {'name': 'John', 'age': 25}\nprint(my_dict['name'])",
+            options: ["25", "'John'", "John", "Error"],
+            correct: 2
+        },
+        {
+            id: 49,
+            category: "Data Structures",
+            difficulty: "medium",
+            question: "How do you add a new key-value pair to a dictionary?",
+            options: ["my_dict[key] = value", "my_dict.add(key, value)", "my_dict.insert(key, value)", "Error"],
+            correct: 0
+        },
+        {
+            id: 50,
+            category: "Data Structures",
+            difficulty: "medium",
+            question: "What is the output of:\nmy_dict = {'a': 1, 'b': 2}\nprint(len(my_dict))",
+            options: ["1", "2", "3", "Error"],
+            correct: 1
+        },
+
+        // Data Structures - Sets (3 questions)
+        {
+            id: 51,
+            category: "Data Structures",
+            difficulty: "easy",
+            question: "What is the output of:\nmy_set = {1, 2, 3}\nprint(1 in my_set)",
+            options: ["False", "True", "1", "Error"],
+            correct: 1
+        },
+        {
+            id: 52,
+            category: "Data Structures",
+            difficulty: "medium",
+            question: "What is the output of:\nmy_set = {1, 2, 2, 3}\nprint(len(my_set))",
+            options: ["3", "4", "2", "Error"],
+            correct: 0
+        },
+        {
+            id: 53,
+            category: "Data Structures",
+            difficulty: "medium",
+            question: "What does my_set.add() do?",
+            options: ["Removes element", "Adds element to set", "Gets element", "Updates set"],
+            correct: 1
+        },
+
+        // Lists and dictionaries combined (3 questions)
+        {
+            id: 54,
+            category: "Data Structures",
+            difficulty: "hard",
+            question: "What is the output of:\nmy_list = [1, 2, 3, 1, 2]\nprint(my_list.count(1))",
+            options: ["1", "2", "3", "Error"],
+            correct: 1
+        },
+        {
+            id: 55,
+            category: "Data Structures",
+            difficulty: "hard",
+            question: "What is the output of:\nmy_list = [5, 2, 8, 1, 9]\nprint(max(my_list))",
+            options: ["1", "9", "5", "Error"],
+            correct: 1
+        },
+        {
+            id: 56,
+            category: "Data Structures",
+            difficulty: "hard",
+            question: "What is the output of:\nmy_dict = {'x': 10, 'y': 20}\nprint(list(my_dict.keys()))",
+            options: ["[10, 20]", "['x', 'y']", "[('x', 10), ('y', 20)]", "Error"],
+            correct: 1
+        },
+
+        // 2D Lists (4 questions)
+        {
+            id: 57,
+            category: "2D Lists",
+            difficulty: "easy",
+            question: "What is the output of:\nmatrix = [[1, 2], [3, 4]]\nprint(matrix[0][1])",
+            options: ["1", "2", "3", "4"],
+            correct: 1
+        },
+        {
+            id: 58,
+            category: "2D Lists",
+            difficulty: "medium",
+            question: "What is the output of:\nmatrix = [[1, 2, 3], [4, 5, 6]]\nprint(matrix[1][2])",
+            options: ["1", "3", "6", "5"],
+            correct: 2
+        },
+        {
+            id: 59,
+            category: "2D Lists",
+            difficulty: "medium",
+            question: "How do you access the first row of a 2D list?",
+            options: ["matrix[0]", "matrix[0][0]", "matrix[1]", "Error"],
+            correct: 0
+        },
+        {
+            id: 60,
+            category: "2D Lists",
+            difficulty: "hard",
+            question: "What is the output of:\nmatrix = [[1, 2], [3, 4], [5, 6]]\nprint(len(matrix))",
+            options: ["2", "3", "6", "Error"],
+            correct: 1
+        },
+
+        // Bubble Sort (5 questions)
+        {
+            id: 61,
+            category: "Bubble Sorting",
+            difficulty: "medium",
+            question: "What is the first step in bubble sort?",
+            options: ["Compare adjacent elements", "Divide array in half", "Find minimum", "Swap largest element"],
+            correct: 0
+        },
+        {
+            id: 62,
+            category: "Bubble Sorting",
+            difficulty: "medium",
+            question: "After one pass of bubble sort, where is the largest element?",
+            options: ["First position", "Middle position", "Last position", "Removed"],
+            correct: 2
+        },
+        {
+            id: 63,
+            category: "Bubble Sorting",
+            difficulty: "medium",
+            question: "What is the time complexity of bubble sort in worst case?",
+            options: ["O(n)", "O(n log n)", "O(n²)", "O(1)"],
+            correct: 2
+        },
+        {
+            id: 64,
+            category: "Bubble Sorting",
+            difficulty: "hard",
+            question: "What is the output after 1st pass of bubble sort on [5, 3, 8, 4]?",
+            options: ["[3, 5, 4, 8]", "[3, 4, 5, 8]", "[5, 3, 4, 8]", "[8, 5, 3, 4]"],
+            correct: 3
+        },
+        {
+            id: 65,
+            category: "Bubble Sorting",
+            difficulty: "hard",
+            question: "How many passes are needed to sort an array of n elements in bubble sort?",
+            options: ["n", "n-1", "log n", "n/2"],
+            correct: 1
+        },
+
+        // Functions (5 questions)
+        {
+            id: 66,
+            category: "Functions",
+            difficulty: "easy",
+            question: "Which keyword is used to define a function?",
+            options: ["func", "function", "def", "define"],
+            correct: 2
+        },
+        {
+            id: 67,
+            category: "Functions",
+            difficulty: "easy",
+            question: "What is the output of:\ndef add(a, b):\n    return a + b\nprint(add(3, 5))",
+            options: ["3", "5", "8", "Error"],
+            correct: 2
+        },
+        {
+            id: 68,
+            category: "Functions",
+            difficulty: "medium",
+            question: "What are the parameters in: def func(x, y, z)?",
+            options: ["func", "x, y, z", "def", "return"],
+            correct: 1
+        },
+        {
+            id: 69,
+            category: "Functions",
+            difficulty: "medium",
+            question: "What is the output of:\ndef greet(name='Guest'):\n    return 'Hello ' + name\nprint(greet())",
+            options: ["Hello", "Hello Guest", "Error", "Guest"],
+            correct: 1
+        },
+        {
+            id: 70,
+            category: "Functions",
+            difficulty: "hard",
+            question: "What is the output of:\ndef func(x):\n    y = x + 5\n    return y\nprint(func(10))\nprint(y)",
+            options: ["15 15", "15 Error", "10 15", "Error"],
+            correct: 1
+        }
+    ];
+
+    // Global Variables
+    let currentQuestion = 0;
+    let userAnswers = new Array(70).fill(-1);
+    let timeLeft = 5400; // 90 minutes in seconds
+    let timerInterval;
+    let reviewMode = false;
+
+    // Initialize
+    function startExam() {
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('examScreen').classList.add('active');
+        displayQuestion();
+        startTimer();
+    }
+
+    function displayQuestion() {
+        const question = questions[currentQuestion];
+        const progress = ((currentQuestion + 1) / 70) * 100;
+
+        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('progressText').textContent = `Question ${currentQuestion + 1} of 70`;
+        document.getElementById('questionNum').textContent = `Q${currentQuestion + 1}`;
+        document.getElementById('currentQuestion').textContent = currentQuestion + 1;
+        document.getElementById('questionText').textContent = question.question;
+        document.getElementById('difficulty').textContent = question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1);
+        document.getElementById('difficulty').className = `difficulty ${question.difficulty}`;
+
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+
+        const labels = ['A', 'B', 'C', 'D'];
+        question.options.forEach((option, index) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'option';
+            if (userAnswers[currentQuestion] === index) {
+                optionDiv.classList.add('selected');
+            }
+            optionDiv.innerHTML = `<span class="option-label">${labels[index]}.</span> ${option}`;
+            optionDiv.onclick = () => selectAnswer(index);
+            optionsContainer.appendChild(optionDiv);
+        });
+
+        document.getElementById('btnPrevious').disabled = currentQuestion === 0;
+        document.getElementById('btnNext').disabled = currentQuestion === 69;
+
+        // Scroll to top
+        document.querySelector('.question-container').scrollIntoView();
+    }
+
+    function selectAnswer(index) {
+        userAnswers[currentQuestion] = index;
+        displayQuestion();
+    }
+
+    function nextQuestion() {
+        if (currentQuestion < 69) {
+            currentQuestion++;
+            displayQuestion();
+        }
+    }
+
+    function previousQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            displayQuestion();
+        }
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                submitExam();
+            }
+        }, 1000);
+    }
+
+    function submitExam() {
+        clearInterval(timerInterval);
+        calculateResults();
+        document.getElementById('examScreen').classList.remove('active');
+        document.getElementById('resultsScreen').classList.add('active');
+    }
+
+    function calculateResults() {
+        let score = 0;
+        const results = [];
+
+        questions.forEach((question, index) => {
+            const answered = userAnswers[index];
+            const isCorrect = answered === question.correct;
+            if (isCorrect) score++;
+
+            results.push({
+                question: question.question,
+                answered: answered >= 0 ? String.fromCharCode(65 + answered) : 'Not answered',
+                correct: String.fromCharCode(65 + question.correct),
+                isCorrect: isCorrect,
+                category: question.category
+            });
+        });
+
+        const percentage = Math.round((score / 70) * 100);
+        document.getElementById('scoreValue').textContent = `${score}/70`;
+        document.getElementById('scorePercentage').textContent = `${percentage}%`;
+
+        let message = '';
+        if (percentage === 100) {
+            message = '🏆 Perfect Score! Outstanding!';
+        } else if (percentage >= 90) {
+            message = '🌟 Excellent Performance!';
+        } else if (percentage >= 75) {
+            message = '👏 Good Job! Keep it up!';
+        } else if (percentage >= 60) {
+            message = '📚 You need more practice!';
+        } else {
+            message = '💪 Keep studying and try again!';
+        }
+        document.getElementById('scoreMessage').textContent = message;
+
+        // Store results for review
+        window.examResults = results;
+    }
+
+    function toggleReview() {
+        reviewMode = document.getElementById('reviewToggle').checked;
+        const reviewSection = document.getElementById('reviewSection');
+
+        if (reviewMode) {
+            reviewSection.style.display = 'block';
+            displayResults();
+        } else {
+            reviewSection.style.display = 'none';
+        }
+    }
+
+    function displayResults() {
+        const resultsDetails = document.getElementById('resultsDetails');
+        resultsDetails.innerHTML = '';
+
+        window.examResults.forEach((result, index) => {
+            const resultItem = document.createElement('div');
+            resultItem.className = `result-item ${result.isCorrect ? 'correct' : 'incorrect'}`;
+
+            resultItem.innerHTML = `
+                    <div class="result-item-question">Q${index + 1}: ${result.question}</div>
+                    <div class="result-item-answer">Your Answer: <strong>${result.answered}</strong></div>
+                    <div class="result-item-answer">Correct Answer: <strong>${result.correct}</strong></div>
+                    <div class="result-item-answer">Category: <strong>${result.category}</strong></div>
+                    <div class="result-item-answer">Status: <strong>${result.isCorrect ? '✓ Correct' : '✗ Incorrect'}</strong></div>
+                `;
+
+            resultsDetails.appendChild(resultItem);
+        });
+    }
+
+    function restartExam() {
+        currentQuestion = 0;
+        userAnswers = new Array(70).fill(-1);
+        timeLeft = 5400;
+        reviewMode = false;
+        document.getElementById('reviewToggle').checked = false;
+
+        document.getElementById('startScreen').classList.remove('hidden');
+        document.getElementById('examScreen').classList.remove('active');
+        document.getElementById('resultsScreen').classList.remove('active');
+    }
+</script>
+</body>
+</html>

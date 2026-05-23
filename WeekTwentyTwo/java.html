@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Exception Handling Visualizer - Interactive</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    header h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      box-shadow: 0 8px 20px rgba(245, 87, 108, 0.4);
+      transform: scale(1.05);
+    }
+
+    .content {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Hierarchy Tab */
+    .hierarchy-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .hierarchy-node {
+      padding: 20px 30px;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      position: relative;
+      display: inline-block;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .hierarchy-node:hover {
+      transform: scale(1.1) translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .node-throwable {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .node-exception {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .node-runtime {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .node-error {
+      background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+    }
+
+    .node-checked {
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      color: #333;
+    }
+
+    .hierarchy-line {
+      width: 3px;
+      height: 30px;
+      background: linear-gradient(to bottom, #667eea, #764ba2);
+    }
+
+    .hierarchy-branch {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .hierarchy-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .node-info {
+      margin-top: 10px;
+      padding: 10px 15px;
+      background: #f5f5f5;
+      border-radius: 5px;
+      font-size: 0.8em;
+      color: #666;
+      max-width: 200px;
+      display: none;
+    }
+
+    .hierarchy-node:hover + .node-info,
+    .node-info:hover {
+      display: block;
+    }
+
+    /* Flow Diagram Tab */
+    .flow-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .flow-box {
+      padding: 25px 40px;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      min-width: 300px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flow-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.1);
+      transition: left 0.3s ease;
+    }
+
+    .flow-box:hover::before {
+      left: 100%;
+    }
+
+    .flow-box:hover {
+      transform: translateX(10px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .flow-try {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .flow-catch {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .flow-finally {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      color: #333;
+    }
+
+    .flow-continue {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .flow-arrow {
+      font-size: 2em;
+      color: #667eea;
+      animation: bounce 1.5s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(10px);
+      }
+    }
+
+    /* Decision Tree Tab */
+    .decision-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .decision-box {
+      padding: 20px 30px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: bold;
+      min-width: 280px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .decision-box:hover {
+      transform: scale(1.08);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .decision-diamond {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      transform: rotate(45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 0 auto;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .decision-diamond:hover {
+      transform: rotate(45deg) scale(1.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .decision-inner {
+      width: 180px;
+      height: 180px;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9em;
+    }
+
+    .decision-path {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .path-yes {
+      padding: 15px 25px;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .path-yes:hover {
+      transform: scale(1.1);
+    }
+
+    .path-no {
+      padding: 15px 25px;
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      color: #333;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .path-no:hover {
+      transform: scale(1.1);
+    }
+
+    /* Comparison Tab */
+    .comparison-table {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: left;
+      font-weight: bold;
+      border: none;
+    }
+
+    td {
+      padding: 20px;
+      border-bottom: 2px solid #e0e0e0;
+      transition: all 0.3s ease;
+    }
+
+    tr:hover td {
+      background: #f5f5f5;
+      transform: scale(1.02);
+    }
+
+    .checked-badge {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .unchecked-badge {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    /* Code Example Tab */
+    .code-section {
+      margin-bottom: 30px;
+    }
+
+    .code-section h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      border-left: 4px solid #667eea;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .code-block:hover {
+      background: #252526;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .code-block code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.95em;
+      line-height: 1.6;
+    }
+
+    .keyword {
+      color: #569cd6;
+    }
+
+    .string {
+      color: #ce9178;
+    }
+
+    .comment {
+      color: #6a9955;
+    }
+
+    .class-name {
+      color: #4ec9b0;
+    }
+
+    .output-box {
+      background: #1e1e1e;
+      color: #4ec9b0;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #4facfe;
+      margin-top: 15px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Propagation Tab */
+    .propagation-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .method-box {
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .method-box:hover {
+      transform: translateX(10px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .method-name {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+
+    .exception-thrown {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-size: 0.9em;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .propagation-arrow {
+      text-align: center;
+      font-size: 2em;
+      color: #667eea;
+      margin: 10px 0;
+    }
+
+    /* Interactive Demo Tab */
+    .demo-section {
+      margin-bottom: 30px;
+    }
+
+    .demo-section h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .demo-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .demo-btn {
+      padding: 12px 24px;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .demo-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .demo-btn.danger {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .demo-output {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 10px;
+      min-height: 100px;
+      border-left: 4px solid #667eea;
+      font-family: 'Courier New', monospace;
+      color: #333;
+    }
+
+    .log-entry {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      background: white;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .log-success {
+      background: #d4edda;
+      color: #155724;
+      border-left: 3px solid #28a745;
+    }
+
+    .log-error {
+      background: #f8d7da;
+      color: #721c24;
+      border-left: 3px solid #f5576c;
+    }
+
+    .log-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border-left: 3px solid #4facfe;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2em;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      .nav-tabs {
+        gap: 5px;
+      }
+
+      .tab-btn {
+        padding: 10px 15px;
+        font-size: 0.9em;
+      }
+
+      .flow-box, .decision-box {
+        min-width: 250px;
+      }
+    }
+
+    /* Scroll Animation */
+    .scroll-indicator {
+      text-align: center;
+      color: #667eea;
+      font-weight: bold;
+      margin-top: 20px;
+      animation: bounce 1.5s infinite;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>☕ Java Exception Handling</h1>
+    <p>Interactive Visual Guide - Click on elements to explore!</p>
+  </header>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="openTab(event, 'hierarchy')">📊 Hierarchy</button>
+    <button class="tab-btn" onclick="openTab(event, 'flow')">🔄 Try-Catch-Finally</button>
+    <button class="tab-btn" onclick="openTab(event, 'decision')">🎯 Decision Tree</button>
+    <button class="tab-btn" onclick="openTab(event, 'comparison')">⚖️ Checked vs Unchecked</button>
+    <button class="tab-btn" onclick="openTab(event, 'code')">💻 Code Examples</button>
+    <button class="tab-btn" onclick="openTab(event, 'propagation')">📤 Exception Propagation</button>
+    <button class="tab-btn" onclick="openTab(event, 'demo')">🎮 Interactive Demo</button>
+  </div>
+
+  <div class="content">
+    <!-- HIERARCHY TAB -->
+    <div id="hierarchy" class="tab-content active">
+      <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Exception Hierarchy</h2>
+      <div class="hierarchy-tree">
+        <div class="hierarchy-item">
+          <div class="hierarchy-node node-throwable" onclick="showInfo(event, 'throwable')">
+            🔴 Throwable
+          </div>
+          <div class="node-info">All errors & exceptions extend this</div>
+        </div>
+
+        <div class="hierarchy-line"></div>
+
+        <div class="hierarchy-branch">
+          <div class="hierarchy-item">
+            <div class="hierarchy-line"></div>
+            <div class="hierarchy-node node-exception" onclick="showInfo(event, 'exception')">
+              🟠 Exception
+            </div>
+            <div class="node-info">Recoverable errors that apps should handle</div>
+            <div class="hierarchy-branch" style="margin-top: 20px;">
+              <div class="hierarchy-item">
+                <div class="hierarchy-line"></div>
+                <div class="hierarchy-node node-checked" onclick="showInfo(event, 'checked')">
+                  ✓ IOException
+                </div>
+              </div>
+              <div class="hierarchy-item">
+                <div class="hierarchy-line"></div>
+                <div class="hierarchy-node node-checked" onclick="showInfo(event, 'checked')">
+                  ✓ SQLException
+                </div>
+              </div>
+              <div class="hierarchy-item">
+                <div class="hierarchy-line"></div>
+                <div class="hierarchy-node node-checked" onclick="showInfo(event, 'checked')">
+                  ✓ FileNotFound
+                </div>
+              </div>
+            </div>
+            <div class="hierarchy-item" style="margin-top: 20px;">
+              <div class="hierarchy-line"></div>
+              <div class="hierarchy-node node-runtime" onclick="showInfo(event, 'runtime')">
+                🟡 RuntimeException
+              </div>
+              <div class="hierarchy-branch" style="margin-top: 20px;">
+                <div class="hierarchy-item">
+                  <div class="hierarchy-line"></div>
+                  <div class="hierarchy-node node-runtime" onclick="showInfo(event, 'runtime')">
+                    • NullPointer
+                  </div>
+                </div>
+                <div class="hierarchy-item">
+                  <div class="hierarchy-line"></div>
+                  <div class="hierarchy-node node-runtime" onclick="showInfo(event, 'runtime')">
+                    • ArrayIndex
+                  </div>
+                </div>
+                <div class="hierarchy-item">
+                  <div class="hierarchy-line"></div>
+                  <div class="hierarchy-node node-runtime" onclick="showInfo(event, 'runtime')">
+                    • Arithmetic
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hierarchy-item">
+            <div class="hierarchy-line"></div>
+            <div class="hierarchy-node node-error" onclick="showInfo(event, 'error')">
+              🔵 Error
+            </div>
+            <div class="node-info">Serious JVM errors - don't catch these</div>
+            <div class="hierarchy-branch" style="margin-top: 20px;">
+              <div class="hierarchy-item">
+                <div class="hierarchy-line"></div>
+                <div class="hierarchy-node node-error" onclick="showInfo(event, 'error')">
+                  • OutOfMemory
+                </div>
+              </div>
+              <div class="hierarchy-item">
+                <div class="hierarchy-line"></div>
+                <div class="hierarchy-node node-error" onclick="showInfo(event, 'error')">
+                  • StackOverflow
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-indicator">💡 Click on any node to see details</div>
+    </div>
+
+    <!-- FLOW TAB -->
+    <div id="flow" class="tab-content">
+      <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Try-Catch-Finally Flow</h2>
+      <div class="flow-diagram">
+        <div class="flow-box flow-try" onclick="highlightFlow(event, 'try')">
+          📦 Enter Try Block
+          <div style="font-size: 0.7em; margin-top: 5px;">Code that might throw exception</div>
+        </div>
+
+        <div class="flow-arrow">⬇️</div>
+
+        <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; width: 100%;">
+          <div style="flex: 1; min-width: 300px;">
+            <div class="flow-box flow-try" onclick="highlightFlow(event, 'no-error')">
+              ✅ No Exception
+              <div style="font-size: 0.7em; margin-top: 5px;">Normal execution continues</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="flow-box flow-try" onclick="highlightFlow(event, 'skip-catch')">
+              ⏭️ Skip Catch Block
+            </div>
+          </div>
+
+          <div style="flex: 1; min-width: 300px;">
+            <div class="flow-box flow-catch" onclick="highlightFlow(event, 'error')">
+              ⚠️ Exception Thrown!
+              <div style="font-size: 0.7em; margin-top: 5px;">Jump to catch block</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="flow-box flow-catch" onclick="highlightFlow(event, 'execute-catch')">
+              🛡️ Execute Catch Block
+              <div style="font-size: 0.7em; margin-top: 5px;">Handle the exception</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">⬇️</div>
+
+        <div class="flow-box flow-finally" onclick="highlightFlow(event, 'finally')">
+          ♻️ Finally Block Executes
+          <div style="font-size: 0.7em; margin-top: 5px;">ALWAYS runs - cleanup resources</div>
+        </div>
+
+        <div class="flow-arrow">⬇️</div>
+
+        <div class="flow-box flow-continue" onclick="highlightFlow(event, 'continue')">
+          ▶️ Program Continues
+          <div style="font-size: 0.7em; margin-top: 5px;">Execution resumes normally</div>
+        </div>
+      </div>
+      <div class="scroll-indicator">💡 Click on boxes to highlight the flow</div>
+    </div>
+
+    <!-- DECISION TAB -->
+    <div id="decision" class="tab-content">
+      <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Exception Handling Decision Tree</h2>
+      <div class="decision-tree">
+        <div class="decision-diamond" onclick="toggleDecision(event)">
+          <div class="decision-inner">
+            Is it a Checked Exception?
+          </div>
+        </div>
+
+        <div class="decision-path">
+          <div class="path-yes" onclick="showPath(event, 'yes')">
+            ✅ YES
+          </div>
+          <div class="path-no" onclick="showPath(event, 'no')">
+            ❌ NO
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 40px; justify-content: center; width: 100%; flex-wrap: wrap;">
+          <div class="decision-box" onclick="toggleDecision(event)">
+            🔒 MUST HANDLE!
+            <div style="font-size: 0.8em; margin-top: 10px;">
+              Compiler enforces it<br>
+              • IOException<br>
+              • SQLException<br>
+              • FileNotFound
+            </div>
+          </div>
+
+          <div class="decision-box" onclick="toggleDecision(event)">
+            ⚡ OPTIONAL (but recommended)
+            <div style="font-size: 0.8em; margin-top: 10px;">
+              RuntimeException<br>
+              • NullPointer<br>
+              • ArrayIndex<br>
+              • Arithmetic
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">
+          👇 Use try-catch or throws keyword 👇
+        </div>
+      </div>
+      <div class="scroll-indicator">💡 Click elements to explore</div>
+    </div>
+
+    <!-- COMPARISON TAB -->
+    <div id="comparison" class="tab-content">
+      <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Checked vs Unchecked Exceptions</h2>
+      <div class="comparison-table">
+        <table>
+          <thead>
+          <tr>
+            <th>Aspect</th>
+            <th><span class="checked-badge">✓ CHECKED</span></th>
+            <th><span class="unchecked-badge">⚡ UNCHECKED</span></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><strong>Must Handle?</strong></td>
+            <td>✅ YES - Compiler enforces</td>
+            <td>❌ NO - Optional</td>
+          </tr>
+          <tr>
+            <td><strong>When Detected?</strong></td>
+            <td>Compile-time (before running)</td>
+            <td>Runtime (during execution)</td>
+          </tr>
+          <tr>
+            <td><strong>Examples</strong></td>
+            <td>IOException, SQLException, FileNotFoundException, ClassNotFoundException</td>
+            <td>NullPointerException, ArrayIndexOutOfBoundsException, ArithmeticException, IllegalArgumentException</td>
+          </tr>
+          <tr>
+            <td><strong>Extends</strong></td>
+            <td>Exception (directly)</td>
+            <td>RuntimeException (extends Exception)</td>
+          </tr>
+          <tr>
+            <td><strong>Typical Cause</strong></td>
+            <td>External resource issues (files, database, network)</td>
+            <td>Programming errors (wrong logic, wrong values)</td>
+          </tr>
+          <tr>
+            <td><strong>How to Handle</strong></td>
+            <td>try-catch OR throws keyword</td>
+            <td>try-catch (optional) OR fix the code</td>
+          </tr>
+          <tr>
+            <td><strong>Code Example</strong></td>
+            <td>FileReader file = new FileReader("file.txt");</td>
+            <td>int[] arr = new int[3]; arr[10] = 5;</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="scroll-indicator">💡 Hover over rows to highlight</div>
+    </div>
+
+    <!-- CODE TAB -->
+    <div id="code" class="tab-content">
+      <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Code Examples</h2>
+
+      <div class="code-section">
+        <h3>1️⃣ Basic Try-Catch-Finally</h3>
+        <div class="code-block">
+          <code><span class="keyword">try</span> {
+            <span class="comment">// Code that might throw exception</span>
+            <span class="keyword">int</span> result = <span class="keyword">10</span> / <span class="keyword">0</span>;  <span class="comment">// ArithmeticException</span>
+            } <span class="keyword">catch</span> (ArithmeticException e) {
+            <span class="comment">// Handle the exception</span>
+            System.out.println(<span class="string">"Cannot divide by zero!"</span>);
+            e.printStackTrace();
+            } <span class="keyword">finally</span> {
+            System.out.println(<span class="string">"Cleanup code here"</span>);
+            }</code>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <h3>2️⃣ Multiple Catch Blocks</h3>
+        <div class="code-block">
+          <code><span class="keyword">try</span> {
+            <span class="keyword">int</span>[] arr = {<span class="keyword">1</span>, <span class="keyword">2</span>, <span class="keyword">3</span>};
+            <span class="keyword">int</span> result = Integer.parseInt(<span class="string">"abc"</span>);
+            <span class="keyword">int</span> value = arr[<span class="keyword">10</span>];
+            } <span class="keyword">catch</span> (NumberFormatException e) {
+            System.out.println(<span class="string">"Invalid number format"</span>);
+            } <span class="keyword">catch</span> (ArrayIndexOutOfBoundsException e) {
+            System.out.println(<span class="string">"Array index out of bounds"</span>);
+            } <span class="keyword">catch</span> (Exception e) {
+            System.out.println(<span class="string">"General exception"</span>);
+            }</code>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <h3>3️⃣ Try-With-Resources (Auto-Close)</h3>
+        <div class="code-block">
+          <code><span class="keyword">try</span> (FileReader file = <span class="keyword">new</span> FileReader(<span class="string">"file.txt"</span>)) {
+            <span class="keyword">int</span> character = file.read();
+            System.out.println((<span class="keyword">char</span>) character);
+            } <span class="keyword">catch</span> (IOException e) {
+            System.out.println(<span class="string">"Error reading file: "</span> + e.getMessage());
+            }
+            <span class="comment">// FileReader is automatically closed here</span></code>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <h3>4️⃣ Throwing Exceptions</h3>
+        <div class="code-block">
+          <code><span class="keyword">public void</span> validateAge(<span class="keyword">int</span> age) <span class="keyword">throws</span> IllegalArgumentException {
+            <span class="keyword">if</span> (age < <span class="keyword">0</span> || age > <span class="keyword">150</span>) {
+            <span class="keyword">throw new</span> IllegalArgumentException(<span class="string">"Invalid age"</span>);
+            }
+            System.out.println(<span class="string">"Valid age: "</span> + age);
+            }
+
+            <span class="comment">// Using it:</span>
+            <span class="keyword">try</span> {
+            validateAge(<span class="keyword">-5</span>);
+            } <span class="keyword">catch</span> (IllegalArgumentException e) {
+            System.out.println(<span class="string">"Caught: "</span> + e.getMessage());
+            }</code>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <h3>5️⃣ Custom Exception</h3>
+        <div class="code-block">
+          <code><span class="keyword">class</span> <span class="class-name">InvalidAgeException</span> <span class="keyword">extends</span> Exception {
+            <span class="keyword">public</span> InvalidAgeException(String message) {
+            <span class="keyword">super</span>(message);
+            }
+            }
+
+            <span class="keyword">try</span> {
+            <span class="keyword">throw new</span> InvalidAgeException(<span class="string">"Must be 18+"</span>);
+            } <span class="keyword">catch</span> (InvalidAgeException e) {
+            System.out.println(<span class="string">"Custom: "</span> + e.getMessage());
+            }</code>
+        </div>
+      </div>
+
+      <div class="scroll-indicator">💡 Click on code blocks to highlight</div>
+    </div>
+
+    <!-- PROPAGATION TAB -->
+    <div id="propagation" class="tab-content">
+      <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Exception Propagation</h2>
+      <div class="propagation-diagram">
+        <div class="method-box" onclick="simulatePropagation(event, 'main')">
+          <div class="method-name">📌 main()</div>
+          <div style="font-size: 0.85em;">Doesn't catch → Exception propagates up</div>
+          <div class="exception-thrown">Exception caught here or CRASH!</div>
+        </div>
+
+        <div class="propagation-arrow">⬆️ Exception travels back</div>
+
+        <div class="method-box" onclick="simulatePropagation(event, 'methodA')">
+          <div class="method-name">📌 methodA()</div>
+          <div style="font-size: 0.85em;">calls methodB() → Doesn't catch</div>
+          <div class="exception-thrown">Exception propagates up</div>
+        </div>
+
+        <div class="propagation-arrow">⬆️ Exception travels back</div>
+
+        <div class="method-box" onclick="simulatePropagation(event, 'methodB')">
+          <div class="method-name">📌 methodB()</div>
+          <div style="font-size: 0.85em;">throws IOException()</div>
+          <div class="exception-thrown">💥 Exception thrown HERE</div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center;">
+          <strong>Call Stack Flow:</strong><br>
+          methodB() → throws → methodA() → methodB() → main() → caught/crash
+        </div>
+      </div>
+      <div class="scroll-indicator">💡 Click boxes to see propagation</div>
+    </div>
+
+    <!-- DEMO TAB -->
+    <div id="demo" class="tab-content">
+      <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">🎮 Interactive Demo</h2>
+
+      <div class="demo-section">
+        <h3>Try-Catch Demo</h3>
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="runTryCatch()">Run Try-Catch Code</button>
+          <button class="demo-btn danger" onclick="simulateError()">Simulate Error</button>
+          <button class="demo-btn" onclick="clearLog()">Clear Log</button>
+        </div>
+        <div class="demo-output" id="demo-output">
+          <div class="log-info">💡 Logs will appear here...</div>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>Exception Type Detector</h3>
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="detectException('IOException')">IOException (Checked)</button>
+          <button class="demo-btn" onclick="detectException('NullPointerException')">NullPointerException (Unchecked)</button>
+          <button class="demo-btn" onclick="detectException('ArrayIndexOutOfBoundsException')">ArrayIndex (Unchecked)</button>
+          <button class="demo-btn" onclick="detectException('CustomException')">Custom Exception</button>
+        </div>
+        <div class="demo-output" id="demo-output2">
+          <div class="log-info">💡 Click a button to detect exception type...</div>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>Flow Simulator</h3>
+        <div class="demo-controls">
+          <button class="demo-btn" onclick="simulateFlow('success')">No Exception (Happy Path)</button>
+          <button class="demo-btn danger" onclick="simulateFlow('error')">With Exception</button>
+        </div>
+        <div class="demo-output" id="demo-output3">
+          <div class="log-info">💡 Click to see the execution flow...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab Navigation
+  function openTab(event, tabName) {
+    // Hide all tab contents
+    const contents = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < contents.length; i++) {
+      contents[i].classList.remove('active');
+    }
+
+    // Remove active class from all buttons
+    const buttons = document.getElementsByClassName('tab-btn');
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].classList.remove('active');
+    }
+
+    // Show the current tab
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Show Info on Node Click
+  function showInfo(event, type) {
+    const info = {
+      throwable: "Throwable is the superclass for all errors and exceptions in Java. It provides methods like getMessage() and printStackTrace().",
+      exception: "Exception represents conditions that a reasonable application might want to catch. It's the base for both checked and unchecked exceptions.",
+      checked: "Checked exceptions must be either caught or declared with the throws keyword. Compiler enforces this.",
+      runtime: "Unchecked exceptions extend RuntimeException. You don't have to handle them, but you should.",
+      error: "Errors indicate serious problems that applications should NOT try to handle. Examples: OutOfMemoryError, StackOverflowError."
+    };
+
+    alert(info[type] || "Click on exception nodes to learn more!");
+  }
+
+  // Highlight Flow
+  function highlightFlow(event, flowType) {
+    const box = event.target.closest('.flow-box');
+    if (!box) return;
+
+    // Reset all boxes
+    document.querySelectorAll('.flow-box').forEach(b => {
+      b.style.opacity = '0.6';
+    });
+
+    // Highlight clicked box
+    box.style.opacity = '1';
+    box.style.transform = 'scale(1.1)';
+
+    setTimeout(() => {
+      document.querySelectorAll('.flow-box').forEach(b => {
+        b.style.opacity = '1';
+        b.style.transform = 'scale(1)';
+      });
+    }, 2000);
+  }
+
+  // Toggle Decision
+  function toggleDecision(event) {
+    const diamond = event.target.closest('.decision-diamond');
+    if (diamond) {
+      diamond.style.animation = 'none';
+      setTimeout(() => {
+        diamond.style.animation = 'bounce 0.5s ease-out';
+      }, 10);
+    }
+  }
+
+  // Show Path
+  function showPath(event, path) {
+    const message = path === 'yes'
+            ? '✅ CHECKED EXCEPTION - Must handle with try-catch or throws!'
+            : '❌ UNCHECKED EXCEPTION - Optional to handle (but recommended!)';
+
+    alert(message);
+  }
+
+  // Simulate Propagation
+  function simulatePropagation(event, method) {
+    const box = event.target.closest('.method-box');
+    if (box) {
+      box.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+      box.style.transform = 'scale(1.05)';
+
+      setTimeout(() => {
+        box.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        box.style.transform = 'scale(1)';
+      }, 1000);
+    }
+  }
+
+  // Demo Functions
+  function addLog(message, type = 'info') {
+    const output = document.getElementById('demo-output');
+    const entry = document.createElement('div');
+    entry.className = `log-entry log-${type}`;
+    entry.textContent = message;
+    output.appendChild(entry);
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function runTryCatch() {
+    clearLog();
+    addLog('▶️ Starting try-catch execution...', 'info');
+    addLog('📦 Entering try block', 'info');
+    addLog('✅ Code executed successfully', 'success');
+    addLog('⏭️ Skipping catch block (no error)', 'info');
+    addLog('♻️ Executing finally block', 'success');
+    addLog('✨ Program continues normally', 'success');
+  }
+
+  function simulateError() {
+    clearLog();
+    addLog('▶️ Starting try-catch execution...', 'info');
+    addLog('📦 Entering try block', 'info');
+    addLog('💥 Exception thrown: ArithmeticException', 'error');
+    addLog('🛡️ Jumping to catch block', 'error');
+    addLog('✅ Exception handled: "Cannot divide by zero!"', 'success');
+    addLog('♻️ Executing finally block', 'info');
+    addLog('✨ Program continues (didn\'t crash)', 'success');
+  }
+
+  function clearLog() {
+    const output = document.getElementById('demo-output');
+    output.innerHTML = '';
+  }
+
+  function detectException(exceptionType) {
+    const output = document.getElementById('demo-output2');
+    output.innerHTML = '';
+
+    const details = {
+      'IOException': {
+        type: '✓ CHECKED EXCEPTION',
+        parent: 'Extends: Exception (directly)',
+        status: '🔒 Compiler enforces handling',
+        example: 'FileNotFoundException, EOF Exception',
+        handle: '📌 Must use try-catch or throws'
+      },
+      'NullPointerException': {
+        type: '⚡ UNCHECKED EXCEPTION',
+        parent: 'Extends: RuntimeException',
+        status: '⚡ Runtime error',
+        example: 'Calling method on null object',
+        handle: '✅ Optional to handle (but fix your code!)'
+      },
+      'ArrayIndexOutOfBoundsException': {
+        type: '⚡ UNCHECKED EXCEPTION',
+        parent: 'Extends: RuntimeException',
+        status: '⚡ Runtime error',
+        example: 'Accessing invalid array index',
+        handle: '✅ Optional to handle (check array bounds!)'
+      },
+      'CustomException': {
+        type: '✓ CUSTOM EXCEPTION',
+        parent: 'Extends: Exception (checked)',
+        status: '🔒 Compiler enforces handling',
+        example: 'class MyException extends Exception {}',
+        handle: '📌 Handle like checked exceptions'
+      }
+    };
+
+    const detail = details[exceptionType];
+
+    addLog2(`<strong>${exceptionType}</strong>`, 'info');
+    addLog2(`Type: ${detail.type}`, 'info');
+    addLog2(`${detail.parent}`, 'info');
+    addLog2(`Status: ${detail.status}`, detail.type.includes('CHECKED') ? 'error' : 'success');
+    addLog2(`Example: ${detail.example}`, 'info');
+    addLog2(`How to Handle: ${detail.handle}`, 'success');
+  }
+
+  function addLog2(message, type = 'info') {
+    const output = document.getElementById('demo-output2');
+    const entry = document.createElement('div');
+    entry.className = `log-entry log-${type}`;
+    entry.innerHTML = message;
+    output.appendChild(entry);
+  }
+
+  function simulateFlow(path) {
+    const output = document.getElementById('demo-output3');
+    output.innerHTML = '';
+
+    if (path === 'success') {
+      addLog3('▶️ Program starts', 'info');
+      addLog3('📦 Enter try block', 'info');
+      addLog3('✅ Execute line 1: int x = 10;', 'success');
+      addLog3('✅ Execute line 2: int y = 20;', 'success');
+      addLog3('✅ Execute line 3: int sum = x + y;', 'success');
+      addLog3('✅ Line 4: println(sum) → Output: 30', 'success');
+      addLog3('⏭️ No exception occurred - Skip catch block', 'info');
+      addLog3('♻️ Execute finally block - Cleanup', 'success');
+      addLog3('✨ Program ends successfully', 'success');
+    } else {
+      addLog3('▶️ Program starts', 'info');
+      addLog3('📦 Enter try block', 'info');
+      addLog3('✅ Execute line 1: int x = 10;', 'success');
+      addLog3('💥 Exception at line 2: int result = x / 0;', 'error');
+      addLog3('🔥 ArithmeticException thrown!', 'error');
+      addLog3('🛡️ Jump to catch block', 'error');
+      addLog3('✅ Catch block executes: Handle exception', 'success');
+      addLog3('✅ Print error message', 'success');
+      addLog3('♻️ Execute finally block - Cleanup', 'success');
+      addLog3('✨ Program continues (didn\'t crash!)', 'success');
+    }
+  }
+
+  function addLog3(message, type = 'info') {
+    const output = document.getElementById('demo-output3');
+    const entry = document.createElement('div');
+    entry.className = `log-entry log-${type}`;
+    entry.textContent = message;
+    output.appendChild(entry);
+  }
+</script>
+</body>
+</html>

@@ -142,6 +142,7 @@ public class Account extends JFrame {
         JRadioButton gender = new JRadioButton();
 
         //Set visible
+        pack();
         setVisible(true);
     }
     public static void main(String[] args) {

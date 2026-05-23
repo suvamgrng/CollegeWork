@@ -22,7 +22,7 @@ public class Main extends JFrame {
         northPanel.add(new JLabel("Student Registration"));
 
         JLabel label1 = new JLabel("Name");
-        JTextField field1 = new JTextField(10);
+        JTextField field1 = new JTextField(5);
         centerPanel.add(label1);
         centerPanel.add(field1);
 

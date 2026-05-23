@@ -1,20 +1,33 @@
 package WeekEighteenNineteenClaude;
 
-import WeekEight.Square;
-
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Arrays;
 
+class Great {
+    String name;
+    int age;
+    String hubby;
+
+    public Great(String name, int age, String hubby) {
+        this.name = name;
+        this.age = age;
+        this.hubby = hubby;
+    }
+    @Override
+    public String toString() {
+        return "Name: " + name +
+                "\nAge: " + age +
+                "\nHubby: " + hubby;
+    }
+}
 public class Arraylist {
     public static void main(String[] args) {
-        ArrayList<String> languages = new ArrayList<>();
-        languages.add("Java");
-        languages.add("Python");
-        languages.add("Kotlin");
+        Great great = new Great("Suvam Gurung", 19, "Coding");
+        ArrayList<Great> languages = new ArrayList<>();
+        languages.add(great);
 
-        // The for-each loop
-        for (String language : languages) {
-            System.out.print(language);
+        for (Great arr: languages) {
+            System.out.println(arr);
         }
     }
 }

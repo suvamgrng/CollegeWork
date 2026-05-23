@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Programming – Week 23 Tutor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+        :root {
+            --bg: #0a0e1a;
+            --card: #111827;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent2: #f59e0b;
+            --accent3: #10b981;
+            --accent4: #ec4899;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --highlight: #1e3a5f;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 36px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+        header h1 span { color: var(--accent); }
+        header p { color: var(--muted); margin-top: 6px; font-size: 0.9rem; }
+        .badge {
+            display: inline-block;
+            background: rgba(245,158,11,0.15);
+            border: 1px solid rgba(245,158,11,0.3);
+            color: var(--accent2);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        /* NAV TABS */
+        nav {
+            display: flex;
+            gap: 2px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            padding: 0 20px;
+        }
+        nav button {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 14px 18px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        nav button.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        nav button:hover:not(.active) { color: var(--text); }
+
+        /* MAIN */
+        main { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* CARDS */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-blue { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .dot-amber { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+        .dot-green { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
+        .dot-pink { background: var(--accent4); box-shadow: 0 0 8px var(--accent4); }
+
+        /* THREE COMPONENTS GRID */
+        .comp-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 10px;
+        }
+        @media(max-width:600px) { .comp-grid { grid-template-columns: 1fr; } }
+        .comp-card {
+            border-radius: 10px;
+            padding: 18px;
+            border: 1px solid;
+        }
+        .comp-card.blue { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.3); }
+        .comp-card.amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); }
+        .comp-card.green { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.3); }
+        .comp-card h3 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; }
+        .comp-card.blue h3 { color: var(--accent); }
+        .comp-card.amber h3 { color: var(--accent2); }
+        .comp-card.green h3 { color: var(--accent3); }
+        .comp-card p { font-size: 0.82rem; color: #94a3b8; line-height: 1.55; }
+        .comp-card .formula {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* STEP BOXES */
+        .steps { counter-reset: step; display: flex; flex-direction: column; gap: 12px; }
+        .step {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        .step-num {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .step-body strong { color: #fff; font-size: 0.9rem; }
+        .step-body p { color: #94a3b8; font-size: 0.82rem; margin-top: 3px; }
+
+        /* FORMULA BOX */
+        .fbox {
+            font-family: 'DM Mono', monospace;
+            background: rgba(59,130,246,0.07);
+            border: 1px solid rgba(59,130,246,0.25);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            color: #93c5fd;
+            margin: 12px 0;
+            line-height: 1.8;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin: 14px 0;
+        }
+        th {
+            background: rgba(59,130,246,0.15);
+            color: var(--accent);
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 9px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-family: 'DM Mono', monospace;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr.winner td { color: var(--accent3); font-weight: 500; }
+        td.max-label { color: var(--accent3); font-weight: 700; font-size: 0.78rem; }
+
+        /* CANVAS GRAPH */
+        #graphCanvas {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: block;
+            background: #0d1525;
+        }
+
+        /* QUIZ */
+        .quiz-q {
+            background: rgba(245,158,11,0.06);
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .quiz-q p { font-weight: 500; margin-bottom: 14px; color: #fcd34d; font-size: 0.9rem; }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-opt {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            text-align: left;
+            color: var(--text);
+        }
+        .quiz-opt:hover { border-color: var(--accent); background: rgba(59,130,246,0.08); }
+        .quiz-opt.correct { background: rgba(16,185,129,0.15); border-color: var(--accent3); color: var(--accent3); }
+        .quiz-opt.wrong { background: rgba(236,72,153,0.1); border-color: var(--accent4); color: var(--accent4); }
+        .quiz-result { margin-top: 10px; font-size: 0.82rem; padding: 8px 12px; border-radius: 6px; display: none; }
+        .quiz-result.show { display: block; }
+        .quiz-result.ok { background: rgba(16,185,129,0.1); color: var(--accent3); }
+        .quiz-result.fail { background: rgba(236,72,153,0.1); color: var(--accent4); }
+
+        /* CW PROBLEM */
+        .cw-problem {
+            background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(59,130,246,0.06));
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .cw-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--accent2);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        /* HINT BOX */
+        .hint {
+            background: rgba(16,185,129,0.07);
+            border-left: 3px solid var(--accent3);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            font-size: 0.83rem;
+            color: #6ee7b7;
+            margin: 10px 0;
+        }
+        .hint strong { color: var(--accent3); }
+
+        /* SECTION TITLE */
+        .sec-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+        .sec-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+
+        /* GRAPH CONTROLS */
+        .graph-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 12px;
+            font-size: 0.8rem;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot {
+            width: 12px; height: 3px;
+            border-radius: 2px;
+        }
+
+        /* VERTEX TABLE styling */
+        .vtable th { background: rgba(16,185,129,0.15); color: var(--accent3); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Linear Programming <span>Graphical Method</span></h1>
+    <p>Logic & Problem Solving — Week 23 Interactive Tutor</p>
+    <div class="badge">⚡ COVERS 50 MARKS IN YOUR GROUP COURSEWORK</div>
+</header>
+
+<nav>
+    <button class="active" onclick="showTab('intro')">① What is LPP?</button>
+    <button onclick="showTab('formulate')">② Formulation Steps</button>
+    <button onclick="showTab('graphical')">③ Graphical Method</button>
+    <button onclick="showTab('worked')">④ Worked Example</button>
+    <button onclick="showTab('cw')">⑤ Your Coursework</button>
+    <button onclick="showTab('quiz')">⑥ Self-Test</button>
+</nav>
+
+<main>
+
+    <!-- ═══════════════ TAB 1: INTRO ═══════════════ -->
+    <div class="section active" id="tab-intro">
+        <div class="sec-title">What is Linear Programming?</div>
+        <div class="sec-sub">Understanding the 3 building blocks before anything else</div>
+
+        <div class="card">
+            <div class="card-title"><span class="dot dot-blue"></span>The Big Idea</div>
+            <p>LP is a mathematical method to find the <strong>best possible decision</strong> (max profit / min cost) given limited resources. Think of it like this:</p>
+            <div class="hint">
+                <strong>Real-world analogy:</strong> You run a factory. You have limited machine hours, labour and raw materials. LP tells you exactly how many of each product to make so you earn the most money — without breaking any limit.
+            </div>
+            <p style="margin-top:12px;">Every LP problem has exactly <strong>three parts</strong>:</p>
+        </div>
+
+        <div class="comp-grid">
+            <div class="comp-card blue">
+                <h3>① Decision Variables</h3>
+                <p>The unknowns you are deciding. Usually labelled <em>x</em> and <em>y</em>. They represent the quantities you control.</p>
+                <div class="formula" style="color:#93c5fd;">x = units of Product 1<br>y = units of Product 2</div>
+                <p style="margin-top:8px;font-size:0.78rem;">⚠ Always non-negative: x ≥ 0, y ≥ 0</p>
+            </div>
+            <div class="comp-card amber">
+                <h3>② Objective Function</h3>
+                <p>The formula for what you want to maximise or minimise. Always linear (no x², no xy).</p>
+                <div class="formula" style="color:#fcd34d;">Maximize Z = 2x + 3y<br>— or —<br>Minimize Z = 5x + 8y</div>
+                <p style="margin-top:8px;font-size:0.78rem;">Z is the value you are optimising (profit, cost, etc.)</p>
+            </div>
+            <div class="comp-card green">
+                <h3>③ Constraints</h3>
+                <p>Resource limits expressed as linear inequalities. They form the "walls" of what is possible.</p>
+                <div class="formula" style="color:#6ee7b7;">2x + 4y ≤ 20  (Machine A)<br>2x + 2y ≤ 12  (Machine B)<br>4x      ≤ 16  (Machine C)</div>
+                <p style="margin-top:8px;font-size:0.78rem;">≤ for limits, ≥ for minimum requirements</p>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+            <div class="card-title"><span class="dot dot-amber"></span>Types of LP Problems (know all four!)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+                <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px;border:1px solid var(--border);">
+                    <div style="color:var(--accent);font-weight:700;font-size:0.85rem;margin-bottom:6px;">🏭 Manufacturing Problem</div>
+                    <div style="color:#94a3b8;font-size:0.8rem;">How many of each product to produce to maximise profit with limited machines/labour.</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px;border:1px solid var(--border);">
+                    <div style="color:var(--accent2);font-weight:700;font-size:0.85rem;margin-bottom:6px;">🥗 Diet Problem</div>
+                    <div style="color:#94a3b8;font-size:0.8rem;">Minimise cost of food while meeting minimum nutritional requirements. Uses ≥ constraints.</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px;border:1px solid var(--border);">
+                    <div style="color:var(--accent3);font-weight:700;font-size:0.85rem;margin-bottom:6px;">🚛 Transportation Problem</div>
+                    <div style="color:#94a3b8;font-size:0.8rem;">Minimise shipping costs from factories to warehouses with supply/demand limits.</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px;border:1px solid var(--border);">
+                    <div style="color:var(--accent4);font-weight:700;font-size:0.85rem;margin-bottom:6px;">📋 Assignment Problem</div>
+                    <div style="color:#94a3b8;font-size:0.8rem;">Assign workers/machines to jobs to minimise total cost or time.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ TAB 2: FORMULATION ═══════════════ -->
+    <div class="section" id="tab-formulate">
+        <div class="sec-title">How to Formulate an LPP</div>
+        <div class="sec-sub">4 steps to convert a word problem into mathematics</div>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <strong>Identify Decision Variables</strong>
+                    <p>Read the problem. What are you deciding "how many of"? Label them x and y. Write a "Let x = …" sentence.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <strong>Write the Objective Function</strong>
+                    <p>What are you maximising or minimising? Usually profit per unit × quantity. Write: Maximize Z = … or Minimize Z = …</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <strong>Express Each Resource Limit as a Constraint</strong>
+                    <p>For each limited resource: (usage per unit of x)×x + (usage per unit of y)×y ≤ available amount. Use ≥ for minimum requirements.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                    <strong>Add Non-negativity Constraints</strong>
+                    <p>Always write: x ≥ 0, y ≥ 0 at the end. You cannot produce negative quantities!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:24px;">
+            <div class="card-title"><span class="dot dot-amber"></span>Worked Formulation: Watch Dealer (Example 1 from slides)</div>
+            <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:12px;">M1 costs $100 (profit $20), M2 costs $200 (profit $50). Max 30 watches, max $4000 budget.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                    <div style="color:var(--accent);font-size:0.8rem;font-weight:700;margin-bottom:6px;">STEP 1 – Variables</div>
+                    <div class="fbox">Let x = No. of M1 watches<br>Let y = No. of M2 watches</div>
+                </div>
+                <div>
+                    <div style="color:var(--accent2);font-size:0.8rem;font-weight:700;margin-bottom:6px;">STEP 2 – Objective Function</div>
+                    <div class="fbox">Maximize Z = 20x + 50y</div>
+                </div>
+            </div>
+
+            <div style="margin-top:12px;">
+                <div style="color:var(--accent3);font-size:0.8rem;font-weight:700;margin-bottom:6px;">STEP 3 – Constraints</div>
+                <div class="fbox">
+                    x + y ≤ 30        ← showcase limit (at most 30 watches total)<br>
+                    100x + 200y ≤ 4000 ← budget limit ($4000 max)
+                </div>
+            </div>
+            <div style="margin-top:12px;">
+                <div style="color:var(--accent4);font-size:0.8rem;font-weight:700;margin-bottom:6px;">STEP 4 – Non-negativity</div>
+                <div class="fbox">x ≥ 0,  y ≥ 0</div>
+            </div>
+        </div>
+
+        <div class="hint">
+            <strong>💡 Tip for your coursework (Problem 2 Part A):</strong> Your problem has 3 plants and 3 models. You'll have 3 decision variables (days for each plant) and 3 model demand constraints — same exact logic, just extended to 3 variables!
+        </div>
+    </div>
+
+    <!-- ═══════════════ TAB 3: GRAPHICAL METHOD ═══════════════ -->
+    <div class="section" id="tab-graphical">
+        <div class="sec-title">The Graphical Method — Step by Step</div>
+        <div class="sec-sub">Used when there are exactly 2 decision variables (x and y)</div>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <strong>Formulate the LPP</strong>
+                    <p>Write the objective function and all constraints. (You already know how to do this from Tab 2!)</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <strong>Convert inequalities → equalities for graphing</strong>
+                    <p>Replace ≤ or ≥ with = to get straight line equations you can plot. E.g., 2x + 4y ≤ 20 becomes 2x + 4y = 20.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <strong>Find two points on each line and plot</strong>
+                    <p>Put x = 0 to find y-intercept, then put y = 0 to find x-intercept. Draw the line through both points.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                    <strong>Do the Origin Test</strong>
+                    <p>Substitute (0,0) into the original inequality. If it's TRUE → origin side is the feasible region (shade toward origin). If FALSE → shade away from origin.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">5</div>
+                <div class="step-body">
+                    <strong>Find corner points of the feasible region</strong>
+                    <p>The feasible region is where ALL shaded areas overlap. Find every corner (vertex) by solving pairs of boundary equations simultaneously.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">6</div>
+                <div class="step-body">
+                    <strong>Evaluate Z at each corner → conclusion</strong>
+                    <p>Plug each corner (x,y) into the objective function Z. The corner giving the highest Z (for max) or lowest Z (for min) is the optimal solution.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+            <div class="card-title"><span class="dot dot-green"></span>Key Concepts: Feasible Region</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+                <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:14px;">
+                    <div style="color:var(--accent3);font-weight:700;margin-bottom:6px;font-size:0.85rem;">Bounded (Closed) Region</div>
+                    <div style="color:#94a3b8;font-size:0.81rem;">The feasible region is a closed polygon (like a triangle or quadrilateral). Has a finite maximum AND minimum. Happens when all constraints are ≤.</div>
+                </div>
+                <div style="background:rgba(236,72,153,0.07);border:1px solid rgba(236,72,153,0.2);border-radius:8px;padding:14px;">
+                    <div style="color:var(--accent4);font-weight:700;margin-bottom:6px;font-size:0.85rem;">Unbounded (Open) Region</div>
+                    <div style="color:#94a3b8;font-size:0.81rem;">The feasible region extends infinitely. Can have a finite minimum (for minimisation) but no maximum. Common in diet problems with ≥ constraints.</div>
+                </div>
+            </div>
+            <div class="hint" style="margin-top:14px;">
+                <strong>Corner Point Theorem:</strong> The optimal value of Z (if it exists) always occurs at one of the corner points of the feasible region. That's why you only need to check corners — not every point inside!
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ TAB 4: WORKED EXAMPLE ═══════════════ -->
+    <div class="section" id="tab-worked">
+        <div class="sec-title">Worked Example — Full Graphical Solution</div>
+        <div class="sec-sub">The factory problem from your slides, solved step by step with a live graph</div>
+
+        <div class="card" style="background:rgba(59,130,246,0.05);border-color:rgba(59,130,246,0.3);">
+            <div class="card-title"><span class="dot dot-blue"></span>Problem Statement</div>
+            <p style="color:#94a3b8;font-size:0.87rem;">A factory has 3 resources: A (20 units), B (12 units), C (16 units). Product 1 needs 2A, 2B, 4C and gives $2 profit. Product 2 needs 4A, 2B, 0C and gives $3 profit. Maximise profit.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="dot dot-amber"></span>Step 1–2: Formulation</div>
+            <div class="fbox">
+                Let x = units of Product 1, y = units of Product 2<br><br>
+                Maximize Z = 2x + 3y<br><br>
+                Subject to:<br>
+                2x + 4y ≤ 20   … (i) Resource A<br>
+                2x + 2y ≤ 12   … (ii) Resource B<br>
+                4x + 0y ≤ 16   … (iii) Resource C<br>
+                x, y ≥ 0
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="dot dot-green"></span>Step 3–4: Plotting & Origin Tests</div>
+            <table>
+                <tr><th>Equation</th><th>When x=0</th><th>When y=0</th><th>Points</th><th>Origin Test (0,0)</th><th>Result</th></tr>
+                <tr>
+                    <td>2x+4y=20 (i)</td><td>y=5</td><td>x=10</td><td>(0,5) and (10,0)</td><td>0≤20 ✓ TRUE</td><td>Shade toward origin</td>
+                </tr>
+                <tr>
+                    <td>2x+2y=12 (ii)</td><td>y=6</td><td>x=6</td><td>(0,6) and (6,0)</td><td>0≤12 ✓ TRUE</td><td>Shade toward origin</td>
+                </tr>
+                <tr>
+                    <td>4x=16 (iii)</td><td colspan="2">x=4 (vertical line)</td><td>x=4</td><td>0≤16 ✓ TRUE</td><td>Shade toward origin (left of x=4)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="dot dot-pink"></span>Step 5: Feasible Region Graph</div>
+            <canvas id="graphCanvas" height="420"></canvas>
+            <div class="graph-legend" style="margin-top:14px;">
+                <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div> 2x+4y=20 (i)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#f472b6"></div> 2x+2y=12 (ii)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div> x=4 (iii)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#fbbf24;height:10px;width:10px;border-radius:50%"></div> Corner Points</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="dot dot-amber"></span>Step 6: Corner Point Evaluation</div>
+            <p style="color:#94a3b8;font-size:0.84rem;margin-bottom:12px;">The feasible region OABCD has 5 corners. Plug each into Z = 2x + 3y:</p>
+            <table class="vtable">
+                <tr><th>Vertex</th><th>x</th><th>y</th><th>Z = 2x + 3y</th></tr>
+                <tr><td>O (0, 0)</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td>A (4, 0)</td><td>4</td><td>0</td><td>8</td></tr>
+                <tr><td>B (4, 2)</td><td>4</td><td>2</td><td>14</td></tr>
+                <tr class="winner"><td>C (2, 4) ⭐</td><td>2</td><td>4</td><td>16 <span class="max-label">← MAXIMUM</span></td></tr>
+                <tr><td>D (0, 5)</td><td>0</td><td>5</td><td>15</td></tr>
+            </table>
+            <div class="hint">
+                <strong>Conclusion:</strong> Maximum profit Z = $16 when x = 2 (Product 1) and y = 4 (Product 2). The factory should produce 2 units of Product 1 and 4 units of Product 2.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="dot dot-blue"></span>How was corner point C (2,4) found?</div>
+            <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:10px;">B is where lines (i) and (ii) intersect. Solve simultaneously:</p>
+            <div class="fbox">
+                2x + 4y = 20  … (i)<br>
+                2x + 2y = 12  … (ii)<br><br>
+                Subtract (ii) from (i):<br>
+                2y = 8  →  y = 4<br><br>
+                Substitute y=4 into (ii): 2x + 8 = 12  →  x = 2<br><br>
+                ∴  C = (2, 4) ✓
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ TAB 5: COURSEWORK ═══════════════ -->
+    <div class="section" id="tab-cw">
+        <div class="sec-title">Your Coursework Problems</div>
+        <div class="sec-sub">Problem 2 covers 50 marks — here's your roadmap</div>
+
+        <div class="cw-problem">
+            <div class="cw-label">Problem 2 – Part B [15 Marks] — Graphical Method</div>
+            <div class="fbox" style="background:rgba(0,0,0,0.3);border-color:rgba(245,158,11,0.3);color:#fde68a;">
+                Maximize Z = 13x + 11y<br><br>
+                Subject to:<br>
+                4x + 5y  ≤ 1500<br>
+                5x + 3y  ≤ 1575<br>
+                x  + 2y  ≤ 420<br>
+                x, y ≥ 0
+            </div>
+
+            <p style="color:#94a3b8;margin:14px 0 10px;font-size:0.85rem;">📋 <strong>Marking scheme breakdown (15 marks):</strong></p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.83rem;">
+                <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(245,158,11,0.15);">
+                    <div style="color:var(--accent2);font-weight:700;margin-bottom:4px;">6 marks</div>
+                    Finding coordinates (intercepts) for each of the 3 equations
+                </div>
+                <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(245,158,11,0.15);">
+                    <div style="color:var(--accent2);font-weight:700;margin-bottom:4px;">3 marks</div>
+                    Origin test for each of the 3 constraints
+                </div>
+                <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(245,158,11,0.15);">
+                    <div style="color:var(--accent2);font-weight:700;margin-bottom:4px;">4 marks</div>
+                    Correct, clearly labelled graph with feasible region shaded
+                </div>
+                <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px;border:1px solid rgba(245,158,11,0.15);">
+                    <div style="color:var(--accent2);font-weight:700;margin-bottom:4px;">2 marks</div>
+                    Corner point evaluation table + correct conclusion
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="dot dot-blue"></span>Part B — Guided Hints (attempt it yourself first!)</div>
+
+            <div class="hint"><strong>Hint 1 – Line 1:</strong> 4x + 5y = 1500. Put x=0 → y=? Put y=0 → x=?</div>
+            <div class="hint"><strong>Hint 2 – Line 2:</strong> 5x + 3y = 1575. Put x=0 → y=? Put y=0 → x=?</div>
+            <div class="hint"><strong>Hint 3 – Line 3:</strong> x + 2y = 420. Put x=0 → y=? Put y=0 → x=?</div>
+            <div class="hint"><strong>Hint 4 – Origin test:</strong> Substitute (0,0) into all 3 original inequalities. Is 0 ≤ 1500? Is 0 ≤ 1575? Is 0 ≤ 420? → All TRUE → origin is inside → shade below/left of each line.</div>
+            <div class="hint"><strong>Hint 5 – Corner points:</strong> Find intersections of: (Line1 ∩ Line2), (Line1 ∩ Line3), (Line2 ∩ Line3), plus the axis intercepts that fall inside the region. Use simultaneous equations.</div>
+        </div>
+
+        <div class="cw-problem" style="margin-top:20px;">
+            <div class="cw-label">Problem 2 – Part A [35 Marks] — Simplex + Excel</div>
+            <p style="color:#fde68a;font-size:0.88rem;font-weight:500;margin-bottom:12px;">Prakash Electric Bulb Company — 3 plants, 3 models</p>
+            <div class="fbox" style="background:rgba(0,0,0,0.3);border-color:rgba(59,130,246,0.3);color:#bfdbfe;font-size:0.82rem;">
+                Plant 1: 8000 Model1, 4000 Model2, 8000 Model3 per day — Cost Rs.55,000/day<br>
+                Plant 2: 6000 Model1, 6000 Model2, 3000 Model3 per day — Cost Rs.60,000/day<br>
+                Plant 3: 12000 Model1, 4000 Model2, 8000 Model3 per day — Cost Rs.60,000/day<br><br>
+                Demand: Model1=300,000 | Model2=172,000 | Model3=249,500
+            </div>
+
+            <div class="hint" style="margin-top:14px;">
+                <strong>Key insight:</strong> Decision variables = days each plant operates (x₁, x₂, x₃). Objective = minimise total cost. Constraints = each model's demand must be MET (so use ≥, not ≤). This makes it a <em>minimisation</em> problem!
+            </div>
+
+            <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;margin-top:12px;font-size:0.82rem;">
+                <div style="color:var(--accent);font-weight:700;margin-bottom:8px;">Formulation skeleton — fill in the blanks:</div>
+                <div class="fbox" style="font-size:0.8rem;color:#94a3b8;">
+                    Let x₁ = days Plant 1 operates<br>
+                    Let x₂ = days Plant 2 operates<br>
+                    Let x₃ = days Plant 3 operates<br><br>
+                    Minimize Z = 55000x₁ + 60000x₂ + 60000x₃<br><br>
+                    Subject to:<br>
+                    8000x₁ + 6000x₂ + 12000x₃ ≥ 300000  (Model 1 demand)<br>
+                    4000x₁ + 6000x₂ + 4000x₃  ≥ 172000  (Model 2 demand)<br>
+                    8000x₁ + 3000x₂ + 8000x₃  ≥ 249500  (Model 3 demand)<br>
+                    x₁, x₂, x₃ ≥ 0
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ TAB 6: QUIZ ═══════════════ -->
+    <div class="section" id="tab-quiz">
+        <div class="sec-title">Self-Test: Check Your Understanding</div>
+        <div class="sec-sub">Attempt each question before revealing the answer</div>
+
+        <div class="quiz-q">
+            <p>Q1. In an LP problem, the Objective Function Z = 5x + 3y represents what?</p>
+            <div class="quiz-options">
+                <button class="quiz-opt" onclick="answer(this, false, 'q1')">A. A constraint on resources</button>
+                <button class="quiz-opt" onclick="answer(this, true, 'q1')">B. The value to be maximised or minimised</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q1')">C. The number of decision variables</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q1')">D. The feasible region boundary</button>
+            </div>
+            <div class="quiz-result" id="q1-result"></div>
+        </div>
+
+        <div class="quiz-q">
+            <p>Q2. When doing an origin test, you put (0,0) into 3x + 2y ≤ 18 and get 0 ≤ 18. What does this mean?</p>
+            <div class="quiz-options">
+                <button class="quiz-opt" onclick="answer(this, false, 'q2')">A. The feasible region is on the opposite side of the origin</button>
+                <button class="quiz-opt" onclick="answer(this, true, 'q2')">B. The origin is inside the feasible region — shade toward origin</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q2')">C. The constraint has no feasible points</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q2')">D. You need to use a different test</button>
+            </div>
+            <div class="quiz-result" id="q2-result"></div>
+        </div>
+
+        <div class="quiz-q">
+            <p>Q3. For the constraint 4x = 16, what does the graph look like?</p>
+            <div class="quiz-options">
+                <button class="quiz-opt" onclick="answer(this, false, 'q3')">A. A diagonal line through (0,4) and (4,0)</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q3')">B. A horizontal line at y = 4</button>
+                <button class="quiz-opt" onclick="answer(this, true, 'q3')">C. A vertical line at x = 4</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q3')">D. A curve passing through the origin</button>
+            </div>
+            <div class="quiz-result" id="q3-result"></div>
+        </div>
+
+        <div class="quiz-q">
+            <p>Q4. The optimal solution to an LP (maximisation) will always occur at...</p>
+            <div class="quiz-options">
+                <button class="quiz-opt" onclick="answer(this, false, 'q4')">A. The origin (0, 0)</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q4')">B. Any random point in the feasible region</button>
+                <button class="quiz-opt" onclick="answer(this, true, 'q4')">C. One of the corner (extreme) points of the feasible region</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q4')">D. The midpoint of the feasible region</button>
+            </div>
+            <div class="quiz-result" id="q4-result"></div>
+        </div>
+
+        <div class="quiz-q">
+            <p>Q5. The Prakash Electric Bulb problem (Part A) uses ≥ constraints. Why?</p>
+            <div class="quiz-options">
+                <button class="quiz-opt" onclick="answer(this, false, 'q5')">A. Because profit must not exceed a limit</button>
+                <button class="quiz-opt" onclick="answer(this, true, 'q5')">B. Because demand must be fully met — production must be AT LEAST the required amount</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q5')">C. Because the number of days cannot exceed the limit</button>
+                <button class="quiz-opt" onclick="answer(this, false, 'q5')">D. Because it is a maximisation problem</button>
+            </div>
+            <div class="quiz-result" id="q5-result"></div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    // TAB SWITCHING
+    function showTab(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('tab-' + id).classList.add('active');
+        document.querySelectorAll('nav button').forEach((b,i) => b.classList.remove('active'));
+        const tabs = ['intro','formulate','graphical','worked','cw','quiz'];
+        document.querySelectorAll('nav button')[tabs.indexOf(id)].classList.add('active');
+        if (id === 'worked') drawGraph();
+    }
+
+    // QUIZ LOGIC
+    function answer(btn, correct, qid) {
+        const opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
+        opts.forEach(o => o.disabled = true);
+        btn.classList.add(correct ? 'correct' : 'wrong');
+        const res = document.getElementById(qid + '-result');
+        res.className = 'quiz-result show ' + (correct ? 'ok' : 'fail');
+        res.textContent = correct
+            ? '✅ Correct! Well done.'
+            : '❌ Not quite. Review the explanation in the earlier tabs and try again.';
+    }
+
+    // GRAPH DRAWING
+    function drawGraph() {
+        const canvas = document.getElementById('graphCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const W = canvas.offsetWidth;
+        const H = 420;
+        canvas.width = W;
+        canvas.height = H;
+
+        const PAD = 55;
+        const XMAX = 11, YMAX = 8;
+        const sx = (W - PAD * 2) / XMAX;
+        const sy = (H - PAD * 2) / YMAX;
+
+        function px(x) { return PAD + x * sx; }
+        function py(y) { return H - PAD - y * sy; }
+
+        // Background
+        ctx.fillStyle = '#0d1525';
+        ctx.fillRect(0, 0, W, H);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= XMAX; x++) {
+            ctx.beginPath(); ctx.moveTo(px(x), PAD); ctx.lineTo(px(x), H - PAD); ctx.stroke();
+        }
+        for (let y = 0; y <= YMAX; y++) {
+            ctx.beginPath(); ctx.moveTo(PAD, py(y)); ctx.lineTo(W - PAD, py(y)); ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(PAD, PAD); ctx.lineTo(PAD, H - PAD); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(PAD, H - PAD); ctx.lineTo(W - PAD, H - PAD); ctx.stroke();
+
+        // Axis labels
+        ctx.fillStyle = '#64748b';
+        ctx.font = '11px DM Mono, monospace';
+        ctx.textAlign = 'center';
+        for (let x = 0; x <= XMAX; x += 2) {
+            ctx.fillText(x, px(x), H - PAD + 18);
+        }
+        ctx.textAlign = 'right';
+        for (let y = 0; y <= YMAX; y += 1) {
+            ctx.fillText(y, PAD - 6, py(y) + 4);
+        }
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px DM Sans, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('x axis', px(XMAX/2), H - 8);
+        ctx.save(); ctx.translate(14, py(YMAX/2)); ctx.rotate(-Math.PI/2);
+        ctx.fillText('y axis', 0, 0); ctx.restore();
+
+        // FEASIBLE REGION (polygon O,A,B,C,D)
+        const corners = [[0,0],[4,0],[4,2],[2,4],[0,5]];
+        ctx.beginPath();
+        ctx.moveTo(px(corners[0][0]), py(corners[0][1]));
+        corners.forEach(c => ctx.lineTo(px(c[0]), py(c[1])));
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(59,130,246,0.12)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(59,130,246,0.3)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Line i: 2x+4y=20 → passes (0,5) and (10,0)
+        ctx.strokeStyle = '#60a5fa';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.moveTo(px(0), py(5));
+        ctx.lineTo(px(10), py(0));
+        ctx.stroke();
+
+        // Line ii: 2x+2y=12 → passes (0,6) and (6,0)
+        ctx.strokeStyle = '#f472b6';
+        ctx.beginPath();
+        ctx.moveTo(px(0), py(6));
+        ctx.lineTo(px(6), py(0));
+        ctx.stroke();
+
+        // Line iii: x=4
+        ctx.strokeStyle = '#34d399';
+        ctx.beginPath();
+        ctx.moveTo(px(4), py(0));
+        ctx.lineTo(px(4), py(YMAX));
+        ctx.stroke();
+
+        // Corner points
+        const labels = ['O(0,0)','A(4,0)','B(4,2)','C(2,4)','D(0,5)'];
+        const offsets = [[-12,-10],[10,-10],[10,10],[-14,10],[-14,-10]];
+        corners.forEach((c, i) => {
+            const isWinner = i === 3;
+            ctx.beginPath();
+            ctx.arc(px(c[0]), py(c[1]), isWinner ? 7 : 5, 0, Math.PI * 2);
+            ctx.fillStyle = isWinner ? '#fbbf24' : '#94a3b8';
+            ctx.fill();
+            if (isWinner) {
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            ctx.fillStyle = isWinner ? '#fde68a' : '#94a3b8';
+            ctx.font = isWinner ? 'bold 12px DM Mono, monospace' : '11px DM Mono, monospace';
+            ctx.textAlign = offsets[i][0] < 0 ? 'right' : 'left';
+            ctx.fillText(labels[i], px(c[0]) + offsets[i][0], py(c[1]) + offsets[i][1]);
+        });
+
+        // Star / max label
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 12px DM Sans';
+        ctx.textAlign = 'left';
+        ctx.fillText('⭐ Z=16 (max)', px(2) + 14, py(4) + 26);
+    }
+</script>
+
+</body>
+</html>
